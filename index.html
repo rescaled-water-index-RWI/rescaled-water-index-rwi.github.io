@@ -5,35 +5,123 @@
   <meta name="description" content="Rescaled Water Index (RWI) – a new spectral index that improves the delineation of urban water bodies compared with NDWI, MNDWI and related indices.">
   <meta name="keywords" content="RWI, Rescaled Water Index, Water Mapping, Remote Sensing, Urban Hydrology, Sentinel‑2">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rescaled Water Index (RWI)</title>
+  <title>Rescaled Water Index (RWI)</title>
 
   <!-- Fonts & theme CSS -->
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
-  <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
-  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="./static/css/index.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 36 36%22><text y=%2232%22 font-size=%2232%22>🌍</text></svg>">
 
+  <!-- MathJax -->
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
   <!-- JS helpers (no analytics) -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <style>
+    /* Clipboard styling inspired by Nougat */
+    .clipboard-btn {
+      position: absolute;
+      top: 0.35rem;
+      right: 0.35rem;
+      opacity: 0;
+      transition: opacity 0.2s, background-color 0.3s;
+      color: rgba(111, 111, 111, 0.7);
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+    }
+    
+    .hover-container {
+      position: relative;
+    }
+    
+    .hover-container:hover .clipboard-btn {
+      opacity: 1;
+    }
+    
+    .clipboard-btn:hover {
+      color: rgba(0, 0, 0, 0.8);
+    }
+    
+    .clipboard-btn.copied {
+      animation: flash-success 0.4s ease-in-out;
+      background-color: #48c78e !important;
+      color: #fff !important;
+      opacity: 1;
+    }
+    
+    @keyframes flash-success {
+      10%, 90% { transform: translateX(-2px); }
+      30%, 70% { transform: translateX(2px); }
+      50%      { transform: translateX(-2px); }
+    }
+    
+    /* Modal styling */
+    .modal-tabs {
+      margin-bottom: 1rem;
+    }
+    
+    .tab-content.is-hidden {
+      display: none;
+    }
+    
+    /* Pre/code styling */
+    pre {
+      position: relative;
+      border-radius: 6px;
+      background-color: #f5f5f5;
+      padding: 1.25em 1.5em;
+    }
+
+    /* Hero and sections */
+    .section {
+      padding: 3rem 1.5rem;
+    }
+    
+    .hero.gee-app {
+      background-color: #f5f5f5;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+    
+    /* Icon styling */
+    .icon-link {
+      margin: 0 0.5rem;
+    }
+    
+    /* Publication styling */
+    .publication-title {
+      font-family: 'Google Sans', sans-serif;
+    }
+    
+    .publication-authors {
+      margin-bottom: 1rem;
+    }
+    
+    .publication-links {
+      margin-top: 1rem;
+    }
+    
+    .author-block {
+      margin-right: 1rem;
+    }
+  </style>
 </head>
 <body>
 
 <!-- ────────────────── NAVBAR ────────────────── -->
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-      <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+    <a role="button" class="navbar-burger" data-target="navMenu">
+      <span></span><span></span><span></span>
     </a>
   </div>
-  <div class="navbar-menu">
+
+  <div id="navMenu" class="navbar-menu">
     <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
       <a class="navbar-item" href="https://rescaled-water-index-rwi.github.io/">
         <span class="icon"><i class="fas fa-home"></i></span>
@@ -41,11 +129,19 @@
       <div class="navbar-item has-dropdown is-hoverable">
         <a class="navbar-link">More</a>
         <div class="navbar-dropdown">
-          <a class="navbar-item" href="https://ieeexplore.ieee.org/document/10967534">IEEE JSTARS Paper</a>
-          <a class="navbar-item" href="https://ieee-dataport.org/documents/rwi">Dataset (IEEE DataPort)</a>
-          <a class="navbar-item" href="https://github.com/edujusti/Rescaled-Water-Index-RWI">Code Repo</a>
+          <a class="navbar-item" href="https://ieeexplore.ieee.org/document/10967534">IEEE JSTARS Paper</a>
+          <a class="navbar-item" href="https://ieee-dataport.org/documents/rwi">Dataset (IEEE DataPort)</a>
+          <a class="navbar-item" href="https://github.com/edujusti/Rescaled-Water-Index-RWI">Code Repo</a>
         </div>
       </div>
+    </div>
+
+    <!-- citation trigger -->
+    <div class="navbar-end">
+      <a id="openCitation" class="navbar-item" title="Citation">
+        <span class="icon"><i class="fas fa-copy"></i></span>
+
+      </a>
     </div>
   </div>
 </nav>
@@ -54,56 +150,75 @@
 <section class="hero">
   <div class="hero-body">
     <div class="container is-max-desktop">
-      <div class="columns is-centered">
-        <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">Rescaled Water Index (RWI)</h1>
-          <h2 class="subtitle is-4">A New Spectral Index for Mapping Water Surfaces in Urban Contexts</h2>
-
-          <!-- Author list -->
-          <div class="is-size-5 publication-authors">
-            <span class="author-block"><a href="#">Eduardo F. Justiniano</a><sup>1</sup>,</span>
-            <span class="author-block"><a href="#">Fernando S. Kawakubo</a><sup>1</sup>,</span>
-            <span class="author-block"><a href="#">Edimilson R. dos Santos Jr.</a><sup>2</sup>,</span>
-            <span class="author-block"><a href="#">Breno M. de Melo</a><sup>2</sup>,</span>
-            <span class="author-block"><a href="#">Gustavo P. Menezes</a><sup>2</sup>,</span>
-            <span class="author-block"><a href="#">Marcel Fantin</a><sup>1</sup>,</span>
-            <span class="author-block"><a href="#">Julio C. Pedrassoli</a><sup>3</sup>,</span>
-            <span class="author-block"><a href="#">Marcos R. Martines</a><sup>2</sup>,</span>
-            <span class="author-block"><a href="#">Rúbia G. Morato</a><sup>1</sup></span>
-          </div>
-          <div class="is-size-5 publication-authors">
-            <span class="author-block"><sup>1</sup>University of São Paulo</span>
-            <span class="author-block"><sup>2</sup>Federal University of São Carlos</span>
-            <span class="author-block"><sup>3</sup>Western Michigan University</span>
-          </div>
-
-          <!-- Links -->
-          <div class="column has-text-centered">
-            <div class="publication-links">
-              <!-- PDF -->
-              <span class="link-block"><a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10967534" class="external-link button is-normal is-rounded is-dark"><span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper (PDF)</span></a></span>
-              <!-- IEEE page -->
-              <span class="link-block"><a href="https://doi.org/10.1109/JSTARS.2025.3562089" class="external-link button is-normal is-rounded is-dark"><span class="icon"><i class="ai ai-ieee"></i></span><span>DOI</span></a></span>
-              <!-- ArXiv / EarthArXiv -->
-              <span class="link-block"><a href="https://eartharxiv.org/repository/view/5556/" class="external-link button is-normal is-rounded is-dark"><span class="icon"><i class="ai ai-arxiv"></i></span><span>Preprint</span></a></span>
-              <!-- Code -->
-              <span class="link-block"><a href="https://github.com/edujusti/Rescaled-Water-Index-RWI" class="external-link button is-normal is-rounded is-dark"><span class="icon"><i class="fab fa-github"></i></span><span>Code</span></a></span>
-              <!-- Data -->
-              <span class="link-block"><a href="https://ieee-dataport.org/documents/rwi" class="external-link button is-normal is-rounded is-dark"><span class="icon"><i class="far fa-images"></i></span><span>Dataset</span></a></span>
-            </div>
-          </div>
+      <div class="has-text-centered">
+        <h1 class="title is-1 publication-title">Rescaled Water Index (RWI)</h1>
+        <h2 class="subtitle is-4">A New Spectral Index for Mapping Water Surfaces in Urban Contexts</h2>
+        
+        <!-- Author list -->
+        <div class="is-size-5 publication-authors">
+          <span class="author-block"><a href="https://orcid.org/0000-0003-1469-4245">Eduardo F. Justiniano</a><sup>1</sup>,</span>
+          <span class="author-block"><a href="https://orcid.org/0000-0002-2045-6318" target="_blank" rel="noopener">Fernando S. Kawakubo</a><sup>1</sup>,</span>
+          <span class="author-block"><a href="https://orcid.org/0000-0002-6694-6515" target="_blank" rel="noopener">Edimilson R. dos Santos Jr.</a><sup>2</sup>,</span>
+          <span class="author-block"><a href="https://orcid.org/0000-0001-8790-8430" target="_blank" rel="noopener">Breno M. de Melo</a><sup>2</sup>,</span>
+          <span class="author-block"><a href="https://orcid.org/0000-0002-0932-0620" target="_blank" rel="noopener">Gustavo P. Menezes</a><sup>2</sup>,</span>
+          <span class="author-block"><a href="https://orcid.org/0000-0003-3069-8019" target="_blank" rel="noopener">Marcel Fantin</a><sup>1</sup>,</span>
+          <span class="author-block"><a href="https://orcid.org/0000-0001-9762-102X">Julio C. Pedrassoli</a><sup>3</sup>,</span>
+          <span class="author-block"><a href="https://orcid.org/0000-0002-7464-2431" target="_blank" rel="noopener">Marcos R. Martines</a><sup>2</sup>,</span>
+          <span class="author-block"><a href="https://orcid.org/0000-0001-6135-4302" target="_blank" rel="noopener">Rúbia G. Morato</a><sup>1</sup></span>
         </div>
+
+        <div class="is-size-5 publication-authors">
+          <span class="author-block"><sup>1</sup>University of São Paulo</span>
+          <span class="author-block"><sup>2</sup>Federal University of São Carlos</span>
+          <span class="author-block"><sup>3</sup>Western Michigan University</span>
+        </div>
+        
+        <!-- Links -->
+        <div class="publication-links">
+          <!-- PDF -->
+          <a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10967534" class="button is-normal is-rounded is-dark">
+            <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper (PDF)</span>
+          </a>
+          <!-- ArXiv / EarthArXiv -->
+          <a href="https://eartharxiv.org/repository/view/7005/" class="button is-normal is-rounded is-dark">
+            <span class="icon"><i class="ai ai-arxiv"></i></span><span>Preprint</span>
+          </a>
+          <!-- Code -->
+          <a href="https://github.com/edujusti/Rescaled-Water-Index-RWI" class="button is-normal is-rounded is-dark">
+            <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+          </a>
+          <!-- Data -->
+          <a href="https://ieee-dataport.org/documents/rwi" class="button is-normal is-rounded is-dark">
+            <span class="icon"><i class="far fa-images"></i></span><span>Dataset</span>
+          </a>
+        </div>
+        
+        <p class="mt-2"><a href="https://doi.org/10.1109/JSTARS.2025.3562089">doi.org/10.1109/JSTARS.2025.3562089</a></p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ────────────────── GEE APP TEASER ────────────────── -->
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <iframe src="https://ee-efjustiniano.projects.earthengine.app/view/rwicomparison" width="100%" height="480" frameborder="0" allowfullscreen></iframe>
-      <h2 class="subtitle has-text-centered">Interactive comparison of <span class="has-text-weight-bold">RWI</span>, MNDWI and NDWI for multiple South‑American cities.</h2>
+<section class="hero gee-app">
+  <div class="container is-fluid">
+    <div class="hero-body" style="padding: 0;">
+      <div class="columns is-centered is-vcentered">
+        <div class="column is-8">
+          <p class="is-size-6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⬐ Click on "Select area" to compare <strong>RWI</strong>, MNDWI, and NDWI for urban water detection in cities around the world.</p>
+          <iframe src="https://ee-efjustiniano.projects.earthengine.app/view/rwicomparison"
+                  width="100%" height="980" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+      <div class="has-text-centered" style="margin-top: 1rem;">
+        <p>This is an interactive visualization built with <strong>Google Earth Engine</strong>.
+          Access it directly at:
+          <a href="https://ee-efjustiniano.projects.earthengine.app/view/rwicomparison"
+             target="_blank" >
+            ee-efjustiniano.projects.earthengine.app/view/rwicomparison
+          </a>
+        </p>
+      </div>
     </div>
   </div>
 </section>
@@ -115,33 +230,107 @@
       <div class="column is-four-fifths">
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
-          <p>The <strong>Rescaled Water Index</strong> (RWI) is an exponential rescaling of the green band in combination with SWIR<sub>1</sub> that suppresses urban shadows and dark impervious materials while enhancing true water pixels. We benchmark RWI against NDWI, MNDWI, AWEI<sub>sh/nsh</sub> across six South‑American cities using Sentinel‑2 imagery and 123 k reference samples. RWI outperforms competing indices in 3 out of 6 cities and yields the highest mean pROC score overall.</p>
+          <p>This paper proposes a modification of the Modified
+          Normalized Difference Water Index (MNDWI) called <strong>Rescaled
+          Water Index (RWI)</strong>, aiming to enhance the delineation and
+          performance of water body mapping in urban contexts. To
+          evaluate the proposed index, we compare its performance in
+          mapping Water Surfaces (WSs) in different cities in South
+          America with the results obtained by other well-known water
+          indices, namely, Normalized Difference Water Index (NDWI),
+          MNDWI, Automated Water Extraction Index (AWEIsh, and
+          AWEInsh)). We utilized images from the Sentinel satellites (2A
+          and 2B), all acquired in June 2021, focusing on cities located south
+          of the Tropic of Capricorn to obtain images with the highest
+          incidence of shading, whose spectral response complicates the
+          mapping of WSs. In this scenario, the present study revealed that
+          selecting the best single index for mapping all WSs is an arduous
+          task, as their performances varied across the analyzed locations.
+          Overall, the performance of the indices, evaluated by the partial
+          Receiver Operating Characteristic (pROC) curve and non-water
+          misclassification point restrictions, revealed quite close results,
+          especially considering the RWI, NDWI, and MNDWI. In the six
+          cities analyzed, the RWI outperformed in three. Additionally,
+          when considering the results for all the cities, the RWI
+          outperformed all the other indices. Our study also rainforced the
+          importance of the complementarity of the indices to improve the
+          performance of the mappings. Such results, therefore, were
+          interpreted as an essential contribution to water body mapping,
+          considering its practical applications in environmental monitoring
+          and water resource management in urbanized areas.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
+
+<!-- ────────────────── FORMULA (hover-clipboard) ────────────────── -->
+<section class="section" id="Formula">
+  <div class="container is-max-desktop">
+    <h2 class="title has-text-centered">RWI formula</h2>
+
+    <div class="box hover-container has-text-centered">
+      <button id="copyLatexInline" class="button is-small is-light is-rounded clipboard-btn">
+        <span class="icon"><i class="fas fa-copy"></i></span>
+
+      </button>
+
+      <span id="latexRWI">$$
+        \mathrm{RWI}
+        \;=\;
+        \frac{G^{\,e^{-1}n^{-1}} \;-\;\mathrm{SWIR1}}
+             {G^{\,e^{-1}n^{-1}} \;+\;\mathrm{SWIR1}}
+        ,\quad
+        n \;=\;
+        \frac{m_d\bigl(G^{\,e^{-1}}\bigr)}{m_d(G)}.
+        $$
+        </span>
+    </div>
+
+    <!-- explanation -->
+    <div class="content">
+      <p><strong>Where</strong>:</p>
+      <ul>
+        <li><em>G</em> – Sentinel‑2 Green band (B3), surface reflectance (0‑1).</li>
+        <li><em>SWIR1</em> – Sentinel‑2 Short‑Wave Infrared‑1 band (B11), surface reflectance.</li>
+        <li><em>e</em> – Euler's number (≈ 2.71828).</li>
+        <li><em>n</em> – scaling factor given by Eq.&nbsp;2 of the paper.</li>
+        <li><em>𝑮̃</em> – pixel‑wise Green band; <em>𝑮̃<sup>e<sup>‑1</sup></sup></em> is its rescaled form.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
 <!-- ────────────────── BIBTEX ────────────────── -->
 <section class="section" id="BibTeX">
-  <div class="container is-max-desktop content">
+  <div class="container is-max-desktop">
     <h2 class="title">BibTeX</h2>
-    <pre><code>@article{Justiniano2025RWI,
-  author   = {Justiniano, Eduardo F. and Kawakubo, Fernando S. and dos Santos Junior, Edimilson R. and de Melo, Breno M. and Menezes, Gustavo P. and Fantin, Marcel and Pedrassoli, Julio C. and Martines, Marcos R. and Morato, Rúbia G.},
+    
+    <div class="hover-container">
+      <button id="copyBibInline" class="button is-small is-light is-rounded clipboard-btn">
+        <span class="icon"><i class="fas fa-copy"></i></span>
+
+      </button>
+
+<pre><code id="bibInline">@article{Justiniano2025RWI,
+  author   = {Justiniano, Eduardo F. and Kawakubo, Fernando S. and dos Santos Junior, Edimilson R. and de Melo, Breno M. and Menezes, Gustavo P. and Fantin, Marcel and Pedrassoli, Julio C. and Martines, Marcos R. and Morato, Rúbia G.},
   title    = {A New Spectral Index for Mapping Water Surfaces in Urban Contexts},
   journal  = {IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing},
   year     = {2025},
   doi      = {10.1109/JSTARS.2025.3562089},
   url      = {https://doi.org/10.1109/JSTARS.2025.3562089}
 }</code></pre>
+    </div>
   </div>
 </section>
 
 <!-- ────────────────── ACKNOWLEDGEMENTS ────────────────── -->
 <section class="section is-light">
-  <div class="container is-max-desktop content">
-    <h2 class="title is-4">Acknowledgments & Funding</h2>
-    <p>This work was supported by CAPES (Grant 677934) and CNPq (process 141065/2021‑4). We also acknowledge the MapBiomas Initiative and UrbVerde platform for infrastructure and feedback.</p>
+  <div class="container is-max-desktop">
+    <h2 class="title is-4">Acknowledgments & Funding</h2>
+    <p>This work was supported by CAPES (Grant 677934) and CNPq (process 141065/2021‑4). We also acknowledge the MapBiomas Initiative and UrbVerde platform for infrastructure and feedback.</p>
   </div>
 </section>
 
@@ -150,16 +339,152 @@
   <div class="container">
     <div class="content has-text-centered">
       <a class="icon-link" href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10967534"><i class="fas fa-file-pdf"></i></a>
-      <a class="icon-link" href="https://github.com/rescaled-water-index-RWI/rescaled-water-index-rwi.github.io"><i class="fab fa-github"></i></a>
+      <a class="icon-link" href="https://github.com/edujusti/Rescaled-Water-Index-RWI"><i class="fab fa-github"></i></a>
+      <a class="icon-link" href="https://github.com/rescaled-water-index-RWI/rescaled-water-index-rwi.github.io"><i class="fab fa-github-alt"></i></a>
     </div>
     <div class="columns is-centered">
-      <div class="column is-8 content">
-        <p>This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution‑ShareAlike 4.0 International License</a>.</p>
-        <p>Website template borrowed from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>. Please remove analytics code when re‑using.</p>
+      <div class="column is-8 content has-text-centered">
+        We thank the authors of <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> and
+        <a href="https://facebookresearch.github.io/nougat/">nougat</a> for the open‑sourced template that inspired this site.
       </div>
     </div>
   </div>
 </footer>
+
+<!-- ────────────────── CITATION MODAL ────────────────── -->
+<div id="citationModal" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Citation</p>
+      <button class="delete" aria-label="close"></button>
+    </header>
+
+    <section class="modal-card-body">
+      <div class="tabs is-centered modal-tabs">
+        <ul>
+          <li class="is-active" data-tab="bib"><a>BibTeX</a></li>
+          <li data-tab="tex"><a>LaTeX formula</a></li>
+        </ul>
+      </div>
+
+      <!-- BibTeX -->
+      <div class="tab-content" id="tab-bib">
+        <div class="hover-container">
+          <button id="copyBibModal" class="button is-small is-light is-rounded clipboard-btn">
+            <span class="icon"><i class="fas fa-copy"></i></span>
+
+          </button>
+<pre><code id="bibModal">@article{Justiniano2025RWI,
+  author   = {Justiniano, Eduardo F. and Kawakubo, Fernando S. and dos Santos Junior, Edimilson R. and de Melo, Breno M. and Menezes, Gustavo P. and Fantin, Marcel and Pedrassoli, Julio C. and Martines, Marcos R. and Morato, Rúbia G.},
+  title    = {A New Spectral Index for Mapping Water Surfaces in Urban Contexts},
+  journal  = {IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing},
+  year     = {2025},
+  doi      = {10.1109/JSTARS.2025.3562089},
+  url      = {https://doi.org/10.1109/JSTARS.2025.3562089}
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- LaTeX -->
+      <div class="tab-content is-hidden" id="tab-tex">
+        <div class="hover-container">
+          <button id="copyFormulaModal" class="button is-small is-light is-rounded clipboard-btn">
+            <span class="icon"><i class="fas fa-copy"></i></span>
+
+          </button>
+<pre><code id="formulaCode">\mathrm{RWI}=\frac{G^{e^{-1}n^{-1}}-\mathrm{SWIR1}}
+                   {G^{e^{-1}n^{-1}}+\mathrm{SWIR1}},\quad
+n=\frac{\tilde G^{e^{-1}}}{\tilde G}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <footer class="modal-card-foot is-justify-content-flex-end">
+      <button class="button is-success">Close</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ────────────────── JS SCRIPT ────────────────── -->
+<script>
+/* Burger menu toggle */
+document.addEventListener('DOMContentLoaded', () => {
+  const $navbarBurger = document.querySelector('.navbar-burger');
+  if ($navbarBurger) {
+    $navbarBurger.addEventListener('click', () => {
+      const target = $navbarBurger.dataset.target;
+      const $target = document.getElementById(target);
+      $navbarBurger.classList.toggle('is-active');
+      $target.classList.toggle('is-active');
+    });
+  }
+});
+
+/* Copy to clipboard with success flash animation */
+function copyToClipboard(elementId, btnElement) {
+  const text = document.getElementById(elementId).textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btnElement.classList.add('copied');
+    setTimeout(() => {
+      btnElement.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+/* Set up clipboard buttons */
+document.getElementById('copyBibInline').addEventListener('click', function() {
+  copyToClipboard('bibInline', this);
+});
+
+document.getElementById('copyLatexInline').addEventListener('click', function() {
+  copyToClipboard('formulaCode', this);
+});
+
+document.getElementById('copyBibModal').addEventListener('click', function() {
+  copyToClipboard('bibModal', this);
+});
+
+document.getElementById('copyFormulaModal').addEventListener('click', function() {
+  copyToClipboard('formulaCode', this);
+});
+
+/* Modal controls */
+const modal = document.getElementById('citationModal');
+const modalBg = modal.querySelector('.modal-background');
+const closeBtn = modal.querySelector('.delete');
+const closeModalBtn = modal.querySelector('.modal-card-foot .button');
+const openModalBtn = document.getElementById('openCitation');
+
+openModalBtn.addEventListener('click', () => {
+  modal.classList.add('is-active');
+});
+
+[modalBg, closeBtn, closeModalBtn].forEach(el => {
+  el.addEventListener('click', () => {
+    modal.classList.remove('is-active');
+  });
+});
+
+/* Tab switching inside modal */
+const tabs = document.querySelectorAll('.modal-tabs li');
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Remove active class from all tabs
+    tabs.forEach(t => t.classList.remove('is-active'));
+    // Add active class to clicked tab
+    tab.classList.add('is-active');
+    
+    // Hide all tab content
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => content.classList.add('is-hidden'));
+    
+    // Show the selected tab content
+    const tabName = tab.getAttribute('data-tab');
+    document.getElementById('tab-' + tabName).classList.remove('is-hidden');
+  });
+});
+</script>
 
 </body>
 </html>
